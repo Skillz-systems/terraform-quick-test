@@ -1,0 +1,35 @@
+version: 2.1
+jobs:
+  deploy-react:
+    docker:
+      - image: circleci/node:18
+    working_directory: ~/repo
+    steps:
+      - checkout
+      # install dependencies
+      - setup_remote_docker:
+          version: 20.10.12
+          docker_layer_caching: true
+      # - run:
+      #     name: Run npm
+      #     command: |
+      #       npm install
+      - run:
+          name: Docker Build
+          command: docker compose Build
+
+      - run: CI=false sudo apt update
+
+workflows:
+  version: 2
+  tibilion_deploy:
+    jobs:
+      - deploy-react: # Use the pre-configured job, deploy-via-git
+          filters:
+            branches:
+              only: staging
+
+      # - deploy-nest: # Use the pre-configured job, deploy-via-git
+      #     filters:
+      #       branches:
+      #         only: nest
