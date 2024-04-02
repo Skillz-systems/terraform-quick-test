@@ -49,7 +49,7 @@ jobs:
       # - run:
       #     name: Update ECS Task Definition
       #     command: |
-      #       aws ecs register-task-definition --family ReactCircleCITaskDefinition --container-definitions '[{"name":"image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'","cpu":1024,"memoryReservation":5120}]'
+      #       aws ecs register-task-definition --family ReactCircleCITaskDefinition --container-definitions '[{"name":"image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'","cpu":1024,"memory":5120}]'
       - run:
           name: Update ECS Service
           command: |
