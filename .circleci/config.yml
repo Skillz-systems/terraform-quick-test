@@ -36,26 +36,24 @@ jobs:
       - run:
           name: Tag Docker image for ECR
           command: |
-            docker tag yourimage:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:$CIRCLE_SHA1
+            docker tag yourimage:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
 
       # Push Docker image to ECR
       - run:
           name: Push Docker image to ECR
           command: |
             aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:$CIRCLE_SHA1
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
 
         # Update ECS Task Definition
       - run:
           name: Update ECS Task Definition
           command: |
-            aws ecs register-task-definition --family NewEC2ECSTaskDefinitionAgain2 --container-definitions '[{"name":"image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:$CIRCLE_SHA1'","cpu": 1024,"memoryReservation":5120}]'
-
-        # Update ECS Service
+            aws ecs register-task-definition --family ReactCircleCITaskDefinition --container-definitions '[{"name":"image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'","cpu":1024,"memoryReservation":5120}]'
       - run:
           name: Update ECS Service
           command: |
-            aws ecs update-service --cluster TestClusterWithCircleCiImage --service TestReact --task-definition NewEC2ECSTaskDefinitionAgain2:3
+            aws ecs update-service --cluster TestClusterWithCircleCiImage --service TestReact --task-definition ReactCircleCITaskDefinition:latest
 
 workflows:
   version: 2
