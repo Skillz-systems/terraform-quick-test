@@ -14,15 +14,40 @@ jobs:
       #     name: Run npm
       #     command: |
       #       npm install
+      # Install AWS CLI
       - run:
-          name: Docker Build
-          command: docker compose Build
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
 
-      - run: CI=false sudo apt update
+      # Authenticate with AWS ECR
+      - run:
+          name: Configure AWS credentials
+          command: aws configure set default.region $AWS_DEFAULT_REGION
+
+      # Build Docker image
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t yourimage:latest .
+
+      # Tag Docker image for ECR
+      - run:
+          name: Tag Docker image for ECR
+          command: |
+            docker tag yourimage:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
+
+      # Push Docker image to ECR
+      - run:
+          name: Push Docker image to ECR
+          command: |
+            aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
 
 workflows:
   version: 2
-  tibilion_deploy:
+  job_deploy:
     jobs:
       - deploy-react: # Use the pre-configured job, deploy-via-git
           filters:
