@@ -49,12 +49,4 @@ workflows:
   version: 2
   job_deploy:
     jobs:
-      - deploy-react: # Use the pre-configured job, deploy-via-git
-          filters:
-            branches:
-              only: staging
-
-      # - deploy-nest: # Use the pre-configured job, deploy-via-git
-      #     filters:
-      #       branches:
-      #         only: nest
+      - deploy-react
