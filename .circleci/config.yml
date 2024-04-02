@@ -16,6 +16,6 @@ workflows:
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build_and_push_image # only run this job once aws-ecr/build-and-push-image has completed
-          family: "ReactCircleCITaskDefinitio"
-          cluster: "TestClusterWithCircleCiImage"
-          container-image-name-updates: "container=image,tag=${CIRCLE_SHA1}"
+          family: "ReactTestTaskDefinition"
+          cluster: "ReactTestCluster"
+          container-image-name-updates: "container=container_image,tag=${CIRCLE_SHA1}"
