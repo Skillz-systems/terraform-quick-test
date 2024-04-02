@@ -45,6 +45,12 @@ jobs:
             aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
             docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
 
+        # Update ECS Service
+      - run:
+          name: Update ECS Service
+          command: |
+            aws ecs update-service --cluster TestClusterWithCircleCiImage --service TestReact --task-definition NewEC2ECSTaskDefinitionAgain2:3
+
 workflows:
   version: 2
   job_deploy:
