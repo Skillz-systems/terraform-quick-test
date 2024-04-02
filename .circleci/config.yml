@@ -46,14 +46,21 @@ jobs:
             docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
 
         # Update ECS Task Definition
-      # - run:
-      #     name: Update ECS Task Definition
-      #     command: |
-      #       aws ecs register-task-definition --family ReactCircleCITaskDefinition --container-definitions '[{"name":"image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'","cpu":1024,"memory":5120}]'
+      - run:
+          name: Update ECS Task Definition
+          command: |
+            aws ecs register-task-definition --family ReactCircleCITaskDefinition --container-definitions '[{"name":"image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'","cpu":1024,"memoryReservation":5120}]'
+
+      - run:
+          name: Get Latest Revision
+          command: |
+            NEW_REVISION_NUMBER=$(aws ecs describe-task-definition --task-definition ReactCircleCITaskDefinition --query 'taskDefinition.revision')
+            echo "New revision number: $NEW_REVISION_NUMBER"
+
       - run:
           name: Update ECS Service
           command: |
-            aws ecs update-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --force-new-deployment --task-definition ReactCircleCITaskDefinition:1
+            aws ecs update-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --force-new-deployment --task-definition ReactCircleCITaskDefinition:$NEW_REVISION_NUMBER
 
 workflows:
   version: 2
