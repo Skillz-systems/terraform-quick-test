@@ -60,7 +60,7 @@ jobs:
       - run:
           name: Update ECS Service
           command: |
-            aws ecs update-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --force-new-deployment --task-definition ReactCircleCITaskDefinition:4
+            aws ecs update-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --force-new-deployment --task-definition ReactCircleCITaskDefinition:$NEW_REVISION_NUMBER
 
 workflows:
   version: 2
