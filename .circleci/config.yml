@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Update ECS Task Definition
           command: |
-            aws ecs register-task-definition --family NewEC2ECSTaskDefinitionAgain2:3 --container-definitions '[{"name":"image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'"}]'
+            aws ecs register-task-definition --family NewEC2ECSTaskDefinitionAgain2 --container-definitions '[{"name":"image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:$CIRCLE_SHA1'"}]'
 
         # Update ECS Service
       - run:
