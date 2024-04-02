@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Update ECS Task Definition
           command: |
-            aws ecs register-task-definition --family ReactTestTaskDefinition --container-definitions '[{"name":"container_image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'","cpu":0,"portMappings": [
+            aws ecs register-task-definition --family ReactTestTaskDefinition --container-definitions '[{"name":"container_image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'","cpu":0,"memory":0,"portMappings": [
               {
                 "containerPort": 80,
                 "hostPort": 80
