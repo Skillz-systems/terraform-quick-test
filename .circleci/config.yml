@@ -20,6 +20,6 @@ workflows:
                 
           requires:
             - aws-ecr/build_and_push_image # only run this job once aws-ecr/build-and-push-image has completed
-          family: ReactCircleCITaskDefinitio
+          family: ReactCircleCITaskDefinition
           cluster: TestClusterWithCircleCiImage
           container_image_name_updates: container=image,tag=${CIRCLE_SHA1}
