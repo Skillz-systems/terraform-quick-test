@@ -12,7 +12,7 @@ workflows:
           auth:
             - aws-cli/setup:
                 #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
-          repo: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab
+          repo: ecr_repo_from_tf_lab
           tag: ${CIRCLE_SHA1}
       - aws-ecs/deploy_service_update:
           auth:
