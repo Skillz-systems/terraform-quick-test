@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Update ECS Service
           command: |
-            aws ecs update-service --cluster TestClusterWithCircleCiImage --service TestReact --task-definition ReactCircleCITaskDefinition:latest
+            aws ecs update-service --cluster TestClusterWithCircleCiImage --service TestReact --task-definition ReactCircleCITaskDefinition:1
 
 workflows:
   version: 2
