@@ -8,9 +8,11 @@ workflows:
   build_and_push_image:
     jobs:
       - aws-ecr/build_and_push_image:
+          account_id: ${AWS_ACCOUNT_ID}
           auth:
             - aws-cli/setup:
-                role_arn: arn:aws:iam::339712738994
+                profile: michael
+                role_arn: arn:aws:iam::339712738994:role/ecsTaskExecutionRole
           repo: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab"
           tag: "${CIRCLE_SHA1}"
       - aws-ecs/deploy-service-update:
