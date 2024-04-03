@@ -1,26 +1,78 @@
 version: 2.1
+jobs:
+  deploy-react:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/repo
+    steps:
+      - checkout
+      # install dependencies
+      - setup_remote_docker:
+          version: 20.10.12
+          docker_layer_caching: true
+      # - run:
+      #     name: Run npm
+      #     command: |
+      #       npm install
+      # Install AWS CLI
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
 
-orbs:
-  aws-ecr: circleci/aws-ecr@9.0.4
-  aws-ecs: circleci/aws-ecs@4.0
-  aws-cli: circleci/aws-cli@4.0
+      # Authenticate with AWS ECR
+      - run:
+          name: Configure AWS credentials
+          command: aws configure set default.region $AWS_DEFAULT_REGION
+
+      # Build Docker image
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t yourimage:latest .
+
+      # Tag Docker image for ECR
+      - run:
+          name: Tag Docker image for ECR
+          command: |
+            docker tag yourimage:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
+
+      # Push Docker image to ECR
+      - run:
+          name: Push Docker image to ECR
+          command: |
+            aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
+
+        # Update ECS Task Definition
+      - run:
+          name: Update ECS Task Definition
+          command: |
+            aws ecs register-task-definition --family ReactTestTaskDefinition 
+            --container-definitions 
+            '[{"name":"container_image","image":"'$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest'","cpu":0,"memory":512,"portMappings": [
+              {
+                "containerPort": 80,
+                "hostPort": 80
+              }
+            ]
+            }]'
+
+      - run:
+          name: Get Latest Revision and update ecs service
+          command: |
+            NEW_REVISION_NUMBER=$(aws ecs describe-task-definition --task-definition ReactTestTaskDefinition --query 'taskDefinition.revision')
+            echo "New revision number: $NEW_REVISION_NUMBER"
+            aws ecs update-service --cluster ReactTestCluster --service ReactTestService --force-new-deployment --task-definition ReactTestTaskDefinition:$NEW_REVISION_NUMBER
+
+      # - run:
+      #     name: Update ECS Service
+      #     command: |
+      #       aws ecs update-service --cluster ReactTestCluster --service ReactTestService --force-new-deployment --task-definition ReactTestTaskDefinition:$NEW_REVISION_NUMBER
 
 workflows:
-  build_and_push_image:
+  version: 2
+  job_deploy:
     jobs:
-      - aws-ecr/build_and_push_image:
-          account_id: ${AWS_ACCOUNT_ID}
-          auth:
-            - aws-cli/setup:
-                role_arn: arn:aws:iam::339712738994:role/ecsTaskExecutionRole
-          repo: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab
-          tag: ${CIRCLE_SHA1}
-      - aws-ecs/deploy_service_update:
-          auth:
-            - aws-cli/setup:
-                role_arn: arn:aws:iam::339712738994:role/ecsTaskExecutionRole
-          requires:
-            - aws-ecr/build_and_push_image # only run this job once aws-ecr/build-and-push-image has completed
-          family: ReactTestTaskDefinition
-          cluster: ReactTestCluster
-          container_image_name_updates: container=container_image,tag=${CIRCLE_SHA1}
+      - deploy-react
