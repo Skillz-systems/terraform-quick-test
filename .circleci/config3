@@ -1,0 +1,37 @@
+version: 2.1
+
+orbs:
+  aws-ecr: circleci/aws-ecr@9.0.4
+  aws-ecs: circleci/aws-ecs@4.0
+
+jobs:
+  build-and-deploy:
+    executor: docker # Use a Docker executor for building the image
+    steps:
+      - checkout
+
+      # Build and tag the image
+      - run:
+          name: Build image
+          command: docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest .
+
+      # Login to ECR using the aws-ecr orb
+      - aws-ecr/login:
+          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab
+
+      # Push the image to ECR using the aws-ecr orb
+      - aws-ecr/push-image:
+          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
+          tag: latest
+
+      # Update the ECS service using the aws-ecs orb
+      - aws-ecs/deploy-service-update:
+          cluster: ReactTestCluster
+          service: ReactTestService
+          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/ecr_repo_from_tf_lab:latest
+          # Optional: Configure additional deployment options (e.g., force update, wait for stability)
+
+workflows:
+  job_deploy:
+    jobs:
+      - build-and-deploy
