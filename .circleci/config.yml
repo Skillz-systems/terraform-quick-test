@@ -32,6 +32,6 @@ jobs:
           # Optional: Configure additional deployment options (e.g., force update, wait for stability)
 
 workflows:
-  main:
+  job_deploy:
     jobs:
       - build-and-deploy
