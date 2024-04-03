@@ -23,4 +23,4 @@ workflows:
           family: ReactCircleCITaskDefinition
           service_name: ReactServiceTest
           cluster: TestClusterWithCircleCiImage
-          container_image_name_updates: container=image,tag=latest #${CIRCLE_SHA1}
+          container_image_name_updates: container=container_image,tag=latest #${CIRCLE_SHA1}
