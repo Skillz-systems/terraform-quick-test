@@ -21,9 +21,7 @@ jobs:
       - run:
           name: Stop and Deregister Service
           command: |
-            aws ecs stop-task-set --cluster TestClusterWithCircleCiImage --service ReactServiceTest --force
-            aws ecs wait tasks-stopped --cluster TestClusterWithCircleCiImage --services ReactServiceTest
-            aws ecs deregister-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --force
+            aws ecs delete-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --force
 
       # Build and Deploy New Service (your existing steps)
       # ... your build and deployment steps ...
