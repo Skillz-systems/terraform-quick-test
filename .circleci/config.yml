@@ -8,11 +8,6 @@ orbs:
 workflows:
   build-and-deploy:
     jobs:
-      - run:
-          name: Stop and delete ECS service
-          command: |
-            aws ecs update-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --desired-count 0 --region $AWS_DEFAULT_REGION
-            aws ecs delete-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --region $AWS_DEFAULT_REGION
       - aws-ecr/build_and_push_image:
           auth:
             - aws-cli/setup:
@@ -26,6 +21,6 @@ workflows:
           requires:
             - aws-ecr/build_and_push_image # only run this job once aws-ecr/build-and-push-image has completed
           family: ReactCircleCITaskDefinition
-          service_name: ReactServiceTest
-          cluster: TestClusterWithCircleCiImage
+          service_name: ReactServiceTest2
+          cluster: TestClusterWithCircleCiImage2
           container_image_name_updates: container=container_image,tag=latest #${CIRCLE_SHA1}
