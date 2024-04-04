@@ -25,26 +25,30 @@ jobs:
 
       # Build and Deploy New Service (your existing steps)
       # ... your build and deployment steps ...
+      - run:
+          name: Create New Service
+          command: |
+            aws ecs create-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --task-definition ReactCircleCITaskDefinition:15 --desired-count 1
 
 workflows:
   kill_service:
     jobs:
       - kill_service
-  build-and-deploy:
-    jobs:
-      - aws-ecr/build_and_push_image:
-          auth:
-            - aws-cli/setup:
-                #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
-          repo: ecr_repo_from_tf_lab
-          tag: latest #${CIRCLE_SHA1}
+  # build-and-deploy:
+  #   jobs:
+  #     - aws-ecr/build_and_push_image:
+  #         auth:
+  #           - aws-cli/setup:
+  #               #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
+  #         repo: ecr_repo_from_tf_lab
+  #         tag: latest #${CIRCLE_SHA1}
 
-      - aws-ecs/deploy_service_update:
-          auth:
-            - aws-cli/setup:
-          requires:
-            - aws-ecr/build_and_push_image # only run this job once aws-ecr/build-and-push-image has completed
-          family: ReactCircleCITaskDefinition
-          service_name: ReactServiceTest
-          cluster: TestClusterWithCircleCiImage
-          container_image_name_updates: container=container_image,tag=latest #${CIRCLE_SHA1}
+  #     - aws-ecs/deploy_service_update:
+  #         auth:
+  #           - aws-cli/setup:
+  #         requires:
+  #           - aws-ecr/build_and_push_image # only run this job once aws-ecr/build-and-push-image has completed
+  #         family: ReactCircleCITaskDefinition
+  #         service_name: ReactServiceTest
+  #         cluster: TestClusterWithCircleCiImage
+  #         container_image_name_updates: container=container_image,tag=latest #${CIRCLE_SHA1}
