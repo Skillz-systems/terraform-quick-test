@@ -11,6 +11,12 @@ jobs:
       - image: circleci/node:latest
     working_directory: ~/repo
     steps:
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
+
       # Stop and Deregister Existing Service (Modify as needed)
       - run:
           name: Stop and Deregister Service
