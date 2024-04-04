@@ -8,16 +8,21 @@ orbs:
 workflows:
   build-and-deploy:
     jobs:
+      - run:
+          name: Stop and delete ECS service
+          command: |
+            aws ecs update-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --desired-count 0 --region $AWS_DEFAULT_REGION
+            aws ecs delete-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --region $AWS_DEFAULT_REGION
       - aws-ecr/build_and_push_image:
           auth:
             - aws-cli/setup:
                 #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
           repo: ecr_repo_from_tf_lab
           tag: latest #${CIRCLE_SHA1}
+
       - aws-ecs/deploy_service_update:
           auth:
             - aws-cli/setup:
-
           requires:
             - aws-ecr/build_and_push_image # only run this job once aws-ecr/build-and-push-image has completed
           family: ReactCircleCITaskDefinition
