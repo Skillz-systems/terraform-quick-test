@@ -35,8 +35,6 @@ workflows:
   build-and-deploy:
     jobs:
       - aws-ecr/build_and_push_image:
-          requires:
-            - kill_service #  job depends on the successful completion of the kill_service job
           auth:
             - aws-cli/setup:
                 #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
