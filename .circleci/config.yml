@@ -28,20 +28,21 @@ jobs:
       - run:
           name: Create New Service
           command: |
-            aws ecs create-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --task-definition ReactCircleCITaskDefinition:15 --desired-count 1
+            aws ecs create-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --task-definition ReactCircleCITaskDefinition:${CIRCLE_SHA1} --desired-count 1
 
 workflows:
-  kill_service:
-    jobs:
-      - kill_service
-  # build-and-deploy:
+  # kill_service:
   #   jobs:
-  #     - aws-ecr/build_and_push_image:
-  #         auth:
-  #           - aws-cli/setup:
-  #               #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
-  #         repo: ecr_repo_from_tf_lab
-  #         tag: latest #${CIRCLE_SHA1}
+  #     - kill_service
+  build-and-deploy:
+    jobs:
+      - aws-ecr/build_and_push_image:
+          auth:
+            - aws-cli/setup:
+                #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
+          repo: ecr_repo_from_tf_lab
+          #tag: latest #${CIRCLE_SHA1}
+          tag: ${CIRCLE_SHA1}
 
   #     - aws-ecs/deploy_service_update:
   #         auth:
