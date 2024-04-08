@@ -21,14 +21,14 @@ jobs:
       - run:
           name: Stop and Deregister Service
           command: |
-            aws ecs delete-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --force
+            aws ecs delete-service --cluster TestClusterWithCircleCiImageAndFargate --service ReactServiceTest --force
 
       # Build and Deploy New Service (your existing steps)
       # ... your build and deployment steps ...
       - run:
           name: Create New Service
           command: |
-            aws ecs create-service --cluster TestClusterWithCircleCiImage --service ReactServiceTest --task-definition ReactCircleCITaskDefinition:${CIRCLE_SHA1} --desired-count 1
+            aws ecs create-service --cluster TestClusterWithCircleCiImageAndFargate --service ReactServiceTest --task-definition ReactCircleCITaskDefinition:${CIRCLE_SHA1} --desired-count 1
 
 workflows:
   # kill_service:
