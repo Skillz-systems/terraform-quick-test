@@ -1,0 +1,55 @@
+version: 2.1
+
+orbs:
+  aws-ecr: circleci/aws-ecr@9.0.4
+  aws-ecs: circleci/aws-ecs@4.0
+  aws-cli: circleci/aws-cli@4.1.3
+
+jobs:
+  kill_service:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/repo
+    steps:
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
+
+      # Stop and Deregister Existing Service (Modify as needed)
+      - run:
+          name: Stop and Deregister Service
+          command: |
+            aws ecs delete-service --cluster TestClusterWithCircleCiImageAndFargate --service ReactServiceTest --force
+
+      # Build and Deploy New Service (your existing steps)
+      # ... your build and deployment steps ...
+      - run:
+          name: Create New Service
+          command: |
+            aws ecs create-service --cluster TestClusterWithCircleCiImageAndFargate --service ReactServiceTest --task-definition ReactCircleCITaskDefinition:${CIRCLE_SHA1} --desired-count 1
+
+workflows:
+  # kill_service:
+  #   jobs:
+  #     - kill_service
+  build-and-deploy:
+    jobs:
+      - aws-ecr/build_and_push_image:
+          auth:
+            - aws-cli/setup:
+                #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
+          repo: ecr_repo_from_tf_lab
+          tag: latest #${CIRCLE_SHA1}
+          #tag: ${CIRCLE_SHA1}
+
+  #     - aws-ecs/deploy_service_update:
+  #         auth:
+  #           - aws-cli/setup:
+  #         requires:
+  #           - aws-ecr/build_and_push_image # only run this job once aws-ecr/build-and-push-image has completed
+  #         family: ReactCircleCITaskDefinition
+  #         service_name: ReactServiceTest
+  #         cluster: TestClusterWithCircleCiImage
+  #         container_image_name_updates: container=container_image,tag=latest #${CIRCLE_SHA1}
