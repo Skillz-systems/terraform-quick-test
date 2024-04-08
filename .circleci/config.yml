@@ -41,8 +41,8 @@ workflows:
             - aws-cli/setup:
                 #role_arn: arn:aws:iam::339712738994:role/aws-service-role/replication.ecr.amazonaws.com/AWSServiceRoleForECRReplication
           repo: ecr_repo_from_tf_lab
-          #tag: latest #${CIRCLE_SHA1}
-          tag: ${CIRCLE_SHA1}
+          tag: latest #${CIRCLE_SHA1}
+          #tag: ${CIRCLE_SHA1}
 
   #     - aws-ecs/deploy_service_update:
   #         auth:
