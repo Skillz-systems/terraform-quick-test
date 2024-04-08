@@ -23,4 +23,4 @@ workflows:
           family: ReactCircleCITaskDefinition_new
           service_name: NGMLClusterService
           cluster: TestClusterEC2Infrastructure2c
-          container_image_name_updates: container=container_image,tag=latest #${CIRCLE_SHA1}
+          container_image_name_updates: container=Container_image,tag=latest #${CIRCLE_SHA1}
